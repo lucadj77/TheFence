@@ -499,13 +499,31 @@
 
         <!-- Schermata iniziale -->
         <div id="schermata-iniziale" class="card">
-            <button class="btn btn-primary" onclick="nuovaPartita()">Nuova partita</button>
-            
-            <div class="divider">oppure</div>
-            
-            <label class="label">Inserisci codice partita</label>
-            <input type="text" id="input-codice" placeholder="es. A7K2MX" maxlength="7" style="text-transform: uppercase;">
-            <button class="btn btn-secondary" onclick="caricaPartita()">Carica partita</button>
+            <!-- Scelta modalità -->
+            <div id="scelta-modalita">
+                <label class="label">Modalità di gioco</label>
+                <button class="btn btn-primary" onclick="scegliModalita('locale')">Gioco Locale (stesso dispositivo)</button>
+                <button class="btn btn-primary" onclick="scegliModalita('remoto')">Gioco Remoto (due dispositivi)</button>
+            </div>
+
+            <!-- Setup partita (nascosto inizialmente) -->
+            <div id="setup-partita" class="hidden">
+                <!-- Selezione giocatore (solo per modalità remota) -->
+                <div id="selezione-giocatore" class="hidden">
+                    <label class="label">Sei il giocatore...</label>
+                    <button class="btn btn-player-a" onclick="scegliGiocatore(1)">Giocatore 1 (inizi tu)</button>
+                    <button class="btn btn-player-b" onclick="scegliGiocatore(2)">Giocatore 2</button>
+                    <div class="divider"></div>
+                </div>
+
+                <button class="btn btn-primary" onclick="nuovaPartita()">Nuova partita</button>
+
+                <div class="divider">oppure</div>
+
+                <label class="label">Inserisci codice partita</label>
+                <input type="text" id="input-codice" placeholder="es. A7K2MX" maxlength="7" style="text-transform: uppercase;">
+                <button class="btn btn-secondary" onclick="caricaPartita()">Carica partita</button>
+            </div>
         </div>
 
         <!-- Schermata di gioco -->
@@ -514,6 +532,13 @@
                 <div class="label">Codice partita</div>
                 <div class="codice" id="codice-display">------</div>
             </div>
+
+            <!-- Indicatore turno (solo modalità remota) -->
+            <div id="indicatore-turno" class="hidden" style="text-align: center; margin: 16px 0; padding: 12px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                <div class="label" style="margin-bottom: 4px;">Turno corrente</div>
+                <div id="turno-display" style="font-size: 1.2rem; font-weight: bold; color: #e94560;"></div>
+            </div>
+
             <label class="label">Inserisci il numero della carta (1-32)</label>
             <input type="number" id="input-carta" min="1" max="32" placeholder="1-32">
             <button class="btn btn-primary" id="btn-conferma" onclick="confermaCarta()">Conferma</button>
@@ -703,17 +728,23 @@
         }
 
         function caricaPartita() {
+            if (modalitaGioco === 'remoto' && !giocatoreCorrente) {
+                alert('Seleziona prima se sei Giocatore 1 o Giocatore 2');
+                return;
+            }
+
             const codice = document.getElementById('input-codice').value;
             if (!codice) {
                 alert('Inserisci un codice partita');
                 return;
             }
-            
+
             if (!decodificaScheda(codice)) {
                 alert('Codice partita non valido');
                 return;
             }
-            
+
+            turnoCorrente = 1; // Inizia sempre il Giocatore 1
             console.log('Partita caricata da codice: ' + codice);
             avviaGioco();
         }
@@ -755,6 +786,11 @@
         let accusaPersonaggio = null;
         let accusaOggetto = null;
         let risposteCalcolate = null;
+
+        // Variabili per modalità gioco remoto
+        let modalitaGioco = 'locale'; // 'locale' o 'remoto'
+        let giocatoreCorrente = 1; // 1 o 2 (identità del giocatore)
+        let turnoCorrente = 1; // 1 o 2 (di chi è il turno)
 
         function generaScheda() {
             let tentativi = 0;
@@ -825,12 +861,40 @@
             return false;
         }
 
+        function scegliModalita(modalita) {
+            modalitaGioco = modalita;
+            document.getElementById('scelta-modalita').classList.add('hidden');
+            document.getElementById('setup-partita').classList.remove('hidden');
+
+            if (modalita === 'remoto') {
+                document.getElementById('selezione-giocatore').classList.remove('hidden');
+            } else {
+                document.getElementById('selezione-giocatore').classList.add('hidden');
+                giocatoreCorrente = 1; // In locale non serve, ma impostiamo un default
+            }
+        }
+
+        function scegliGiocatore(giocatore) {
+            giocatoreCorrente = giocatore;
+            // Evidenzia il bottone selezionato
+            document.querySelectorAll('#selezione-giocatore .btn').forEach(btn => {
+                btn.style.opacity = '0.5';
+            });
+            event.target.style.opacity = '1';
+        }
+
         function nuovaPartita() {
+            if (modalitaGioco === 'remoto' && !giocatoreCorrente) {
+                alert('Seleziona prima se sei Giocatore 1 o Giocatore 2');
+                return;
+            }
+
             if (!generaScheda()) {
                 alert('Errore nella generazione della scheda. Riprova.');
                 return;
             }
-            
+
+            turnoCorrente = 1; // Inizia sempre il Giocatore 1
             console.log(`Nuova partita - Codice: ${codificaScheda()}`);
             avviaGioco();
         }
@@ -870,6 +934,29 @@
 
             accusaPersonaggio = null;
             accusaOggetto = null;
+
+            // Mostra/nascondi indicatore turno in base alla modalità
+            if (modalitaGioco === 'remoto') {
+                document.getElementById('indicatore-turno').classList.remove('hidden');
+                aggiornaInterfacciaTurno();
+            } else {
+                document.getElementById('indicatore-turno').classList.add('hidden');
+            }
+        }
+
+        function aggiornaInterfacciaTurno() {
+            if (modalitaGioco !== 'remoto') return;
+
+            const isMioTurno = (giocatoreCorrente === turnoCorrente);
+            const turnoDisplay = document.getElementById('turno-display');
+
+            if (isMioTurno) {
+                turnoDisplay.textContent = '🎯 È il tuo turno!';
+                turnoDisplay.style.color = '#4caf50';
+            } else {
+                turnoDisplay.textContent = `Turno del Giocatore ${turnoCorrente}`;
+                turnoDisplay.style.color = '#ff9800';
+            }
         }
 
         function confermaCarta() {
@@ -894,10 +981,32 @@
                 `<strong>Carta ${numeroCarta}:</strong> ${getOggettoHtml(cartaCorrente.oggetto)} in ${tipoZona} ${cartaCorrente.zona}`;
 
             document.getElementById('area-risposte').classList.remove('hidden');
+
+            // Aggiorna testi bottoni in base alla modalità
+            if (modalitaGioco === 'remoto') {
+                const isMioTurno = (giocatoreCorrente === turnoCorrente);
+
+                if (isMioTurno) {
+                    // Chi ha il turno vede solo il bottone per la quantità
+                    document.getElementById('btn-giocatore-a').textContent = 'Vedi la tua risposta (Quantità)';
+                    document.getElementById('btn-container-a').classList.remove('hidden');
+                    document.getElementById('btn-container-b').classList.add('hidden');
+                } else {
+                    // Chi non ha il turno vede solo il bottone per la posizione
+                    document.getElementById('btn-giocatore-b').textContent = 'Vedi la tua risposta (Posizione)';
+                    document.getElementById('btn-container-a').classList.add('hidden');
+                    document.getElementById('btn-container-b').classList.remove('hidden');
+                }
+            } else {
+                // Modalità locale: mostra entrambi i bottoni con testi originali
+                document.getElementById('btn-giocatore-a').textContent = 'Giocatore A (chi ha giocato)';
+                document.getElementById('btn-giocatore-b').textContent = 'Giocatore B (chi non ha giocato)';
+                document.getElementById('btn-container-a').classList.remove('hidden');
+                document.getElementById('btn-container-b').classList.remove('hidden');
+            }
+
             document.getElementById('btn-giocatore-a').disabled = false;
             document.getElementById('btn-giocatore-b').disabled = false;
-            document.getElementById('btn-container-a').classList.remove('hidden');
-            document.getElementById('btn-container-b').classList.remove('hidden');
             document.getElementById('risposta-a').classList.add('hidden');
             document.getElementById('risposta-b').classList.add('hidden');
             document.getElementById('btn-chiudi-a').classList.add('hidden');
@@ -975,6 +1084,12 @@
             document.getElementById('input-carta').value = '';
             document.getElementById('btn-conferma').disabled = false;
             cartaCorrente = null;
+
+            // Passa il turno in modalità remota
+            if (modalitaGioco === 'remoto') {
+                turnoCorrente = (turnoCorrente === 1) ? 2 : 1;
+                aggiornaInterfacciaTurno();
+            }
         }
 
         function apriAccusa() {
