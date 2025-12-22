@@ -754,6 +754,7 @@
 
         let accusaPersonaggio = null;
         let accusaOggetto = null;
+        let risposteCalcolate = null;
 
         function generaScheda() {
             let tentativi = 0;
@@ -884,6 +885,9 @@
             rispostaAVista = false;
             rispostaBVista = false;
 
+            // Calcola le risposte UNA SOLA VOLTA
+            risposteCalcolate = calcolaRisposta();
+
             // Mostra info carta
             const tipoZona = cartaCorrente.tipo === 'riga' ? 'Riga' : 'Colonna';
             document.getElementById('carta-info').innerHTML = 
@@ -924,8 +928,7 @@
         }
 
         function mostraRispostaA() {
-            const risposte = calcolaRisposta();
-            document.getElementById('risposta-a').textContent = risposte.rispostaA;
+            document.getElementById('risposta-a').textContent = risposteCalcolate.rispostaA;
             document.getElementById('risposta-a').classList.remove('hidden');
             document.getElementById('btn-giocatore-a').disabled = true;
             document.getElementById('btn-chiudi-a').classList.remove('hidden');
@@ -934,8 +937,7 @@
         }
 
         function mostraRispostaB() {
-            const risposte = calcolaRisposta();
-            document.getElementById('risposta-b').textContent = risposte.rispostaB;
+            document.getElementById('risposta-b').textContent = risposteCalcolate.rispostaB;
             document.getElementById('risposta-b').classList.remove('hidden');
             document.getElementById('btn-giocatore-b').disabled = true;
             document.getElementById('btn-chiudi-b').classList.remove('hidden');
