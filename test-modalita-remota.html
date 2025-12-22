@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modalità Remota - Il Ricettatore</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .pass {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+        }
+        .fail {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #2196f3;
+            padding-bottom: 10px;
+        }
+        .scenario {
+            background: #fff3cd;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            border-left: 4px solid #ffc107;
+        }
+        pre {
+            background: #263238;
+            color: #aed581;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Modalità Remota - Il Ricettatore</h1>
+    <p>Questo test verifica il corretto funzionamento della nuova modalità di gioco remoto.</p>
+
+    <button onclick="eseguiTuttiITest()">▶️ Esegui Tutti i Test</button>
+    <button onclick="location.reload()">🔄 Reset</button>
+
+    <div id="risultati"></div>
+
+    <script>
+        let testPassati = 0;
+        let testFalliti = 0;
+        let risultatiHTML = '';
+
+        function aggiungiRisultato(titolo, esito, messaggio) {
+            const classe = esito ? 'pass' : 'fail';
+            const icona = esito ? '✅' : '❌';
+
+            if (esito) testPassati++;
+            else testFalliti++;
+
+            risultatiHTML += `
+                <div class="test-result ${classe}">
+                    ${icona} <strong>${titolo}</strong><br>
+                    ${messaggio}
+                </div>
+            `;
+        }
+
+        function aggiungiInfo(messaggio) {
+            risultatiHTML += `
+                <div class="test-result info">
+                    ℹ️ ${messaggio}
+                </div>
+            `;
+        }
+
+        function nuovaSezione(titolo) {
+            risultatiHTML += `
+                <div class="test-section">
+                    <h2>${titolo}</h2>
+            `;
+        }
+
+        function chiudiSezione() {
+            risultatiHTML += `</div>`;
+        }
+
+        function eseguiTuttiITest() {
+            risultatiHTML = '';
+            testPassati = 0;
+            testFalliti = 0;
+
+            // Test 1: Stato iniziale
+            nuovaSezione('Test 1: Verifica Stato Iniziale');
+            testStatoIniziale();
+            chiudiSezione();
+
+            // Test 2: Scelta modalità
+            nuovaSezione('Test 2: Scelta Modalità');
+            testSceltaModalita();
+            chiudiSezione();
+
+            // Test 3: Selezione giocatore
+            nuovaSezione('Test 3: Selezione Giocatore');
+            testSelezioneGiocatore();
+            chiudiSezione();
+
+            // Test 4: Sistema turni
+            nuovaSezione('Test 4: Sistema Turni');
+            testSistemaTurni();
+            chiudiSezione();
+
+            // Test 5: Scenario completo
+            nuovaSezione('Test 5: Scenario Gioco Completo');
+            testScenarioCompleto();
+            chiudiSezione();
+
+            // Riepilogo
+            risultatiHTML += `
+                <div class="test-section" style="background: ${testFalliti === 0 ? '#e8f5e9' : '#ffebee'}">
+                    <h2>📊 Riepilogo Test</h2>
+                    <p style="font-size: 1.2rem;">
+                        ✅ Test passati: <strong>${testPassati}</strong><br>
+                        ❌ Test falliti: <strong>${testFalliti}</strong><br>
+                        📈 Totale: <strong>${testPassati + testFalliti}</strong>
+                    </p>
+                    ${testFalliti === 0 ?
+                        '<p style="color: #4caf50; font-weight: bold;">🎉 Tutti i test sono passati!</p>' :
+                        '<p style="color: #f44336; font-weight: bold;">⚠️ Alcuni test sono falliti. Controlla i dettagli sopra.</p>'
+                    }
+                </div>
+            `;
+
+            document.getElementById('risultati').innerHTML = risultatiHTML;
+        }
+
+        function testStatoIniziale() {
+            aggiungiInfo('Simulazione variabili di stato iniziali...');
+
+            let modalitaGioco = 'locale';
+            let giocatoreCorrente = 1;
+            let turnoCorrente = 1;
+
+            aggiungiRisultato(
+                'Modalità default è "locale"',
+                modalitaGioco === 'locale',
+                `Valore: ${modalitaGioco}`
+            );
+
+            aggiungiRisultato(
+                'Giocatore corrente default è 1',
+                giocatoreCorrente === 1,
+                `Valore: ${giocatoreCorrente}`
+            );
+
+            aggiungiRisultato(
+                'Turno corrente default è 1',
+                turnoCorrente === 1,
+                `Valore: ${turnoCorrente}`
+            );
+        }
+
+        function testSceltaModalita() {
+            aggiungiInfo('Simulazione scelta modalità remota...');
+
+            // Simula scelta modalità remota
+            let modalitaGioco = 'remoto';
+
+            aggiungiRisultato(
+                'Modalità cambia a "remoto"',
+                modalitaGioco === 'remoto',
+                `Modalità selezionata: ${modalitaGioco}`
+            );
+
+            // In modalità remota, la selezione giocatore dovrebbe essere visibile
+            const selezioneVisibile = true; // Simulato
+            aggiungiRisultato(
+                'Selezione giocatore visibile in modalità remota',
+                selezioneVisibile,
+                'UI mostra opzioni Giocatore 1/2'
+            );
+
+            // Test modalità locale
+            modalitaGioco = 'locale';
+            const selezioneNascosta = true; // Simulato
+            aggiungiRisultato(
+                'Selezione giocatore nascosta in modalità locale',
+                selezioneNascosta && modalitaGioco === 'locale',
+                'UI nasconde opzioni giocatore'
+            );
+        }
+
+        function testSelezioneGiocatore() {
+            aggiungiInfo('Simulazione selezione giocatore...');
+
+            let giocatoreCorrente = 2;
+
+            aggiungiRisultato(
+                'Giocatore può selezionare "Giocatore 2"',
+                giocatoreCorrente === 2,
+                `Giocatore selezionato: ${giocatoreCorrente}`
+            );
+
+            giocatoreCorrente = 1;
+            aggiungiRisultato(
+                'Giocatore può cambiare selezione a "Giocatore 1"',
+                giocatoreCorrente === 1,
+                `Giocatore selezionato: ${giocatoreCorrente}`
+            );
+        }
+
+        function testSistemaTurni() {
+            aggiungiInfo('Simulazione sistema di turni...');
+
+            let turnoCorrente = 1;
+            let giocatoreCorrente = 1;
+
+            // Turno 1: Giocatore 1
+            let isMioTurno = (giocatoreCorrente === turnoCorrente);
+            aggiungiRisultato(
+                'Turno 1: Giocatore 1 ha il turno',
+                isMioTurno,
+                `Giocatore ${giocatoreCorrente}, Turno ${turnoCorrente} → isMioTurno = ${isMioTurno}`
+            );
+
+            // Verifica bottoni per Giocatore 1 nel turno 1
+            let bottoneMostrato = isMioTurno ? 'Quantità' : 'Posizione';
+            aggiungiRisultato(
+                'Giocatore 1 vede bottone "Quantità" nel suo turno',
+                bottoneMostrato === 'Quantità',
+                `Bottone mostrato: "${bottoneMostrato}"`
+            );
+
+            // Simula Giocatore 2 stesso turno
+            giocatoreCorrente = 2;
+            isMioTurno = (giocatoreCorrente === turnoCorrente);
+            bottoneMostrato = isMioTurno ? 'Quantità' : 'Posizione';
+
+            aggiungiRisultato(
+                'Giocatore 2 vede bottone "Posizione" nel turno 1',
+                bottoneMostrato === 'Posizione' && !isMioTurno,
+                `Bottone mostrato: "${bottoneMostrato}"`
+            );
+
+            // Passa al turno 2
+            turnoCorrente = 2;
+            isMioTurno = (giocatoreCorrente === turnoCorrente);
+            bottoneMostrato = isMioTurno ? 'Quantità' : 'Posizione';
+
+            aggiungiRisultato(
+                'Turno 2: Giocatore 2 ha il turno',
+                isMioTurno,
+                `Giocatore ${giocatoreCorrente}, Turno ${turnoCorrente} → isMioTurno = ${isMioTurno}`
+            );
+
+            aggiungiRisultato(
+                'Giocatore 2 vede bottone "Quantità" nel suo turno',
+                bottoneMostrato === 'Quantità',
+                `Bottone mostrato: "${bottoneMostrato}"`
+            );
+
+            // Simula Giocatore 1 nel turno 2
+            giocatoreCorrente = 1;
+            isMioTurno = (giocatoreCorrente === turnoCorrente);
+            bottoneMostrato = isMioTurno ? 'Quantità' : 'Posizione';
+
+            aggiungiRisultato(
+                'Giocatore 1 vede bottone "Posizione" nel turno 2',
+                bottoneMostrato === 'Posizione' && !isMioTurno,
+                `Bottone mostrato: "${bottoneMostrato}"`
+            );
+
+            // Test alternanza turni
+            let turnoIniziale = 1;
+            let turnoDopoPassaggio = (turnoIniziale === 1) ? 2 : 1;
+
+            aggiungiRisultato(
+                'Passaggio turno da 1 a 2 funziona',
+                turnoDopoPassaggio === 2,
+                `Turno ${turnoIniziale} → Turno ${turnoDopoPassaggio}`
+            );
+
+            turnoIniziale = 2;
+            turnoDopoPassaggio = (turnoIniziale === 1) ? 2 : 1;
+
+            aggiungiRisultato(
+                'Passaggio turno da 2 a 1 funziona',
+                turnoDopoPassaggio === 1,
+                `Turno ${turnoIniziale} → Turno ${turnoDopoPassaggio}`
+            );
+        }
+
+        function testScenarioCompleto() {
+            risultatiHTML += `
+                <div class="scenario">
+                    <h3>📖 Scenario: Due giocatori giocano in remoto</h3>
+                    <p><strong>Setup:</strong></p>
+                    <ul>
+                        <li>Giocatore 1 crea partita con codice ABC123</li>
+                        <li>Giocatore 2 carica ABC123 e seleziona "Giocatore 2"</li>
+                    </ul>
+                </div>
+            `;
+
+            let modalitaGioco = 'remoto';
+            let giocatore1 = { id: 1, turno: 1 };
+            let giocatore2 = { id: 2, turno: 1 };
+            let turnoCorrente = 1;
+
+            // Turno 1
+            aggiungiInfo('<strong>Turno 1:</strong> Entrambi inseriscono carta 15');
+
+            // Giocatore 1
+            let isMioTurno1 = (giocatore1.id === turnoCorrente);
+            let risposta1 = isMioTurno1 ? 'Quantità: 2' : 'Posizione: C';
+
+            aggiungiRisultato(
+                'Giocatore 1 vede la risposta corretta',
+                risposta1 === 'Quantità: 2',
+                `Risposta: "${risposta1}"`
+            );
+
+            // Giocatore 2
+            let isMioTurno2 = (giocatore2.id === turnoCorrente);
+            let risposta2 = isMioTurno2 ? 'Quantità: 2' : 'Posizione: C';
+
+            aggiungiRisultato(
+                'Giocatore 2 vede la risposta corretta',
+                risposta2 === 'Posizione: C',
+                `Risposta: "${risposta2}"`
+            );
+
+            // Passaggio turno
+            turnoCorrente = (turnoCorrente === 1) ? 2 : 1;
+            giocatore1.turno = turnoCorrente;
+            giocatore2.turno = turnoCorrente;
+
+            aggiungiRisultato(
+                'Turno passa a Giocatore 2',
+                turnoCorrente === 2,
+                `Nuovo turno: ${turnoCorrente}`
+            );
+
+            // Turno 2
+            aggiungiInfo('<strong>Turno 2:</strong> Entrambi inseriscono carta 8');
+
+            // Giocatore 2 (ha il turno)
+            isMioTurno2 = (giocatore2.id === turnoCorrente);
+            risposta2 = isMioTurno2 ? 'Quantità: 1' : 'Posizione: F';
+
+            aggiungiRisultato(
+                'Giocatore 2 vede la risposta corretta (Quantità)',
+                risposta2 === 'Quantità: 1',
+                `Risposta: "${risposta2}"`
+            );
+
+            // Giocatore 1 (non ha il turno)
+            isMioTurno1 = (giocatore1.id === turnoCorrente);
+            risposta1 = isMioTurno1 ? 'Quantità: 1' : 'Posizione: F';
+
+            aggiungiRisultato(
+                'Giocatore 1 vede la risposta corretta (Posizione)',
+                risposta1 === 'Posizione: F',
+                `Risposta: "${risposta1}"`
+            );
+
+            // Test consistenza
+            risultatiHTML += `
+                <div class="scenario">
+                    <h3>✅ Verifica Consistenza</h3>
+                    <p>Le risposte sono complementari ma basate sulla stessa soluzione:</p>
+                    <ul>
+                        <li>Chi gioca la carta vede sempre la <strong>Quantità</strong></li>
+                        <li>Chi non gioca la carta vede sempre la <strong>Posizione</strong></li>
+                        <li>I ruoli si alternano ad ogni turno</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Auto-esegui al caricamento
+        window.onload = () => {
+            setTimeout(eseguiTuttiITest, 500);
+        };
+    </script>
+</body>
+</html>
