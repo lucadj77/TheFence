@@ -1069,12 +1069,37 @@
         }
 
         function verificaCompletamento() {
-            if (rispostaAVista && rispostaBVista) {
-                const rispostaAChiusa = document.getElementById('risposta-a').classList.contains('hidden');
-                const rispostaBChiusa = document.getElementById('risposta-b').classList.contains('hidden');
-                
-                if (rispostaAChiusa && rispostaBChiusa) {
-                    document.getElementById('btn-prossima').classList.remove('hidden');
+            if (modalitaGioco === 'remoto') {
+                // In modalità remota, ogni giocatore vede solo la sua risposta
+                // Mostra "Prossima domanda" quando il giocatore ha visto e chiuso la sua risposta
+                const isMioTurno = (giocatoreCorrente === turnoCorrente);
+
+                if (isMioTurno) {
+                    // Chi ha il turno vede risposta A
+                    if (rispostaAVista) {
+                        const rispostaAChiusa = document.getElementById('risposta-a').classList.contains('hidden');
+                        if (rispostaAChiusa) {
+                            document.getElementById('btn-prossima').classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    // Chi non ha il turno vede risposta B
+                    if (rispostaBVista) {
+                        const rispostaBChiusa = document.getElementById('risposta-b').classList.contains('hidden');
+                        if (rispostaBChiusa) {
+                            document.getElementById('btn-prossima').classList.remove('hidden');
+                        }
+                    }
+                }
+            } else {
+                // Modalità locale: aspetta che entrambe le risposte siano state viste e chiuse
+                if (rispostaAVista && rispostaBVista) {
+                    const rispostaAChiusa = document.getElementById('risposta-a').classList.contains('hidden');
+                    const rispostaBChiusa = document.getElementById('risposta-b').classList.contains('hidden');
+
+                    if (rispostaAChiusa && rispostaBChiusa) {
+                        document.getElementById('btn-prossima').classList.remove('hidden');
+                    }
                 }
             }
         }
