@@ -907,9 +907,9 @@
 
             if (modalita === 'remoto') {
                 document.getElementById('selezione-giocatore').classList.remove('hidden');
-                // Aggiorna i bottoni con i nomi dei giocatori
-                document.getElementById('btn-scegli-g1').innerHTML = `<span style="color: ${COLORE_GIOCATORE1}">${nomeGiocatore1}</span> (inizi tu)`;
-                document.getElementById('btn-scegli-g2').textContent = nomeGiocatore2;
+                // Aggiorna i bottoni con i nomi dei giocatori (in bianco per contrasto)
+                document.getElementById('btn-scegli-g1').innerHTML = `<strong>${nomeGiocatore1}</strong> (inizi tu)`;
+                document.getElementById('btn-scegli-g2').innerHTML = `<strong>${nomeGiocatore2}</strong>`;
             } else {
                 document.getElementById('selezione-giocatore').classList.add('hidden');
                 giocatoreCorrente = 1; // In locale non serve, ma impostiamo un default
