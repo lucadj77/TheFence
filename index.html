@@ -1042,9 +1042,11 @@
                     document.getElementById('btn-container-b').classList.remove('hidden');
                 }
             } else {
-                // Modalità locale: mostra entrambi i bottoni con nomi dinamici
-                document.getElementById('btn-giocatore-a').innerHTML = `<span style="color: ${COLORE_GIOCATORE1}">${nomeGiocatore1}</span> (chi ha indagato)`;
-                document.getElementById('btn-giocatore-b').innerHTML = `<span style="color: ${COLORE_GIOCATORE2}">${nomeGiocatore2}</span> (avversario)`;
+                // Modalità locale: mostra entrambi i bottoni con nomi in base al turno
+                const nomeChiIndaga = getNomeGiocatore(turnoCorrente);
+                const nomeAvversario = getNomeGiocatore(turnoCorrente === 1 ? 2 : 1);
+                document.getElementById('btn-giocatore-a').innerHTML = `<strong>${nomeChiIndaga}</strong> (chi ha indagato)`;
+                document.getElementById('btn-giocatore-b').innerHTML = `<strong>${nomeAvversario}</strong> (avversario)`;
                 document.getElementById('btn-container-a').classList.remove('hidden');
                 document.getElementById('btn-container-b').classList.remove('hidden');
             }
@@ -1155,9 +1157,10 @@
             document.getElementById('btn-conferma').disabled = false;
             cartaCorrente = null;
 
-            // Passa il turno in modalità remota
+            // Passa il turno (in entrambe le modalità)
+            turnoCorrente = (turnoCorrente === 1) ? 2 : 1;
+
             if (modalitaGioco === 'remoto') {
-                turnoCorrente = (turnoCorrente === 1) ? 2 : 1;
                 aggiornaInterfacciaTurno();
             }
         }
