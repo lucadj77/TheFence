@@ -1042,9 +1042,9 @@
                     document.getElementById('btn-container-b').classList.remove('hidden');
                 }
             } else {
-                // Modalità locale: mostra entrambi i bottoni con nomi dinamici
-                document.getElementById('btn-giocatore-a').innerHTML = `<span style="color: ${COLORE_GIOCATORE1}">${nomeGiocatore1}</span> (chi ha indagato)`;
-                document.getElementById('btn-giocatore-b').innerHTML = `<span style="color: ${COLORE_GIOCATORE2}">${nomeGiocatore2}</span> (avversario)`;
+                // Modalità locale: mostra entrambi i bottoni con nomi dinamici (in bianco per contrasto)
+                document.getElementById('btn-giocatore-a').innerHTML = `<strong>${nomeGiocatore1}</strong> (chi ha indagato)`;
+                document.getElementById('btn-giocatore-b').innerHTML = `<strong>${nomeGiocatore2}</strong> (avversario)`;
                 document.getElementById('btn-container-a').classList.remove('hidden');
                 document.getElementById('btn-container-b').classList.remove('hidden');
             }
