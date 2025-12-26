@@ -497,8 +497,22 @@
     <div class="container">
         <h1>The Fence</h1>
 
+        <!-- Schermata inserimento nomi -->
+        <div id="schermata-nomi" class="card">
+            <label class="label">Inserisci i nomi dei giocatori (facoltativo)</label>
+            <div style="margin-bottom: 12px;">
+                <label class="label" style="color: #4a90a4;">Giocatore 1</label>
+                <input type="text" id="input-nome-1" class="input-nome" placeholder="Giocatore 1" maxlength="20" style="width: 100%; padding: 12px; border: 2px solid rgba(74, 144, 164, 0.4); border-radius: 8px; background: rgba(0,0,0,0.3); color: #4a90a4; font-size: 1rem; margin-bottom: 8px;">
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label class="label" style="color: #a4904a;">Giocatore 2</label>
+                <input type="text" id="input-nome-2" class="input-nome" placeholder="Giocatore 2" maxlength="20" style="width: 100%; padding: 12px; border: 2px solid rgba(164, 144, 74, 0.4); border-radius: 8px; background: rgba(0,0,0,0.3); color: #a4904a; font-size: 1rem;">
+            </div>
+            <button class="btn btn-primary" onclick="confermaNomi()">Continua</button>
+        </div>
+
         <!-- Schermata iniziale -->
-        <div id="schermata-iniziale" class="card">
+        <div id="schermata-iniziale" class="card hidden">
             <!-- Scelta modalità -->
             <div id="scelta-modalita">
                 <label class="label">Modalità di gioco</label>
@@ -511,8 +525,8 @@
                 <!-- Selezione giocatore (solo per modalità remota) -->
                 <div id="selezione-giocatore" class="hidden">
                     <label class="label">Sei il giocatore...</label>
-                    <button class="btn btn-player-a" onclick="scegliGiocatore(1)">Giocatore 1 (inizi tu)</button>
-                    <button class="btn btn-player-b" onclick="scegliGiocatore(2)">Giocatore 2</button>
+                    <button class="btn btn-player-a" id="btn-scegli-g1" onclick="scegliGiocatore(1)">Giocatore 1 (inizi tu)</button>
+                    <button class="btn btn-player-b" id="btn-scegli-g2" onclick="scegliGiocatore(2)">Giocatore 2</button>
                     <div class="divider"></div>
                 </div>
 
@@ -539,7 +553,7 @@
                 <div id="turno-display" style="font-size: 1.2rem; font-weight: bold; color: #e94560;"></div>
             </div>
 
-            <label class="label">Inserisci il numero della carta (1-32)</label>
+            <label class="label">Inserisci il Codice Indagine (1-32)</label>
             <input type="number" id="input-carta" min="1" max="32" placeholder="1-32">
             <button class="btn btn-primary" id="btn-conferma" onclick="confermaCarta()">Conferma</button>
 
@@ -548,7 +562,7 @@
                 
                 <div id="btn-container-a">
                     <button class="btn btn-player-a" id="btn-giocatore-a" onclick="mostraRispostaA()">
-                        Giocatore A (chi ha giocato)
+                        Giocatore 1 (chi ha indagato)
                     </button>
                 </div>
                 <div id="risposta-a" class="response-box response-a hidden"></div>
@@ -556,14 +570,14 @@
 
                 <div id="btn-container-b">
                     <button class="btn btn-player-b" id="btn-giocatore-b" onclick="mostraRispostaB()">
-                        Giocatore B (avversario)
+                        Giocatore 2 (avversario)
                     </button>
                 </div>
                 <div id="risposta-b" class="response-box response-b hidden"></div>
                 <button class="btn btn-close hidden" id="btn-chiudi-b" onclick="chiudiRispostaB()">Chiudi</button>
 
                 <button class="btn btn-secondary hidden" id="btn-prossima" onclick="prossimaDomanda()">
-                    Prossima domanda
+                    Prossima indagine
                 </button>
             </div>
         </div>
@@ -729,7 +743,7 @@
 
         function caricaPartita() {
             if (modalitaGioco === 'remoto' && !giocatoreCorrente) {
-                alert('Seleziona prima se sei Giocatore 1 o Giocatore 2');
+                alert(`Seleziona prima se sei ${nomeGiocatore1} o ${nomeGiocatore2}`);
                 return;
             }
 
@@ -787,10 +801,35 @@
         let accusaOggetto = null;
         let risposteCalcolate = null;
 
+        // Variabili per i nomi dei giocatori
+        let nomeGiocatore1 = 'Giocatore 1';
+        let nomeGiocatore2 = 'Giocatore 2';
+        const COLORE_GIOCATORE1 = '#4a90a4'; // Teal/Azzurro
+        const COLORE_GIOCATORE2 = '#a4904a'; // Ambra/Oro
+
         // Variabili per modalità gioco remoto
         let modalitaGioco = 'locale'; // 'locale' o 'remoto'
         let giocatoreCorrente = 1; // 1 o 2 (identità del giocatore)
         let turnoCorrente = 1; // 1 o 2 (di chi è il turno)
+
+        function confermaNomi() {
+            const nome1 = document.getElementById('input-nome-1').value.trim();
+            const nome2 = document.getElementById('input-nome-2').value.trim();
+
+            nomeGiocatore1 = nome1 || 'Giocatore 1';
+            nomeGiocatore2 = nome2 || 'Giocatore 2';
+
+            document.getElementById('schermata-nomi').classList.add('hidden');
+            document.getElementById('schermata-iniziale').classList.remove('hidden');
+        }
+
+        function getNomeGiocatore(numero) {
+            return numero === 1 ? nomeGiocatore1 : nomeGiocatore2;
+        }
+
+        function getColoreGiocatore(numero) {
+            return numero === 1 ? COLORE_GIOCATORE1 : COLORE_GIOCATORE2;
+        }
 
         function generaScheda() {
             let tentativi = 0;
@@ -868,6 +907,9 @@
 
             if (modalita === 'remoto') {
                 document.getElementById('selezione-giocatore').classList.remove('hidden');
+                // Aggiorna i bottoni con i nomi dei giocatori
+                document.getElementById('btn-scegli-g1').innerHTML = `<span style="color: ${COLORE_GIOCATORE1}">${nomeGiocatore1}</span> (inizi tu)`;
+                document.getElementById('btn-scegli-g2').textContent = nomeGiocatore2;
             } else {
                 document.getElementById('selezione-giocatore').classList.add('hidden');
                 giocatoreCorrente = 1; // In locale non serve, ma impostiamo un default
@@ -885,7 +927,7 @@
 
         function nuovaPartita() {
             if (modalitaGioco === 'remoto' && !giocatoreCorrente) {
-                alert('Seleziona prima se sei Giocatore 1 o Giocatore 2');
+                alert(`Seleziona prima se sei ${nomeGiocatore1} o ${nomeGiocatore2}`);
                 return;
             }
 
@@ -949,12 +991,14 @@
 
             const isMioTurno = (giocatoreCorrente === turnoCorrente);
             const turnoDisplay = document.getElementById('turno-display');
+            const nomeAltro = getNomeGiocatore(turnoCorrente);
+            const coloreAltro = getColoreGiocatore(turnoCorrente);
 
             if (isMioTurno) {
                 turnoDisplay.textContent = '🎯 È il tuo turno!';
                 turnoDisplay.style.color = '#4caf50';
             } else {
-                turnoDisplay.textContent = `Turno del Giocatore ${turnoCorrente}`;
+                turnoDisplay.innerHTML = `Turno di <span style="color: ${coloreAltro}">${nomeAltro}</span>`;
                 turnoDisplay.style.color = '#ff9800';
             }
         }
@@ -964,7 +1008,7 @@
             const numeroCarta = parseInt(input.value);
 
             if (isNaN(numeroCarta) || numeroCarta < 1 || numeroCarta > 32) {
-                alert('Inserisci un numero tra 1 e 32');
+                alert('Inserisci un Codice Indagine valido (1-32)');
                 return;
             }
 
@@ -975,10 +1019,10 @@
             // Calcola le risposte UNA SOLA VOLTA
             risposteCalcolate = calcolaRisposta();
 
-            // Mostra info carta
+            // Mostra info codice indagine
             const tipoZona = cartaCorrente.tipo === 'riga' ? 'Riga' : 'Colonna';
-            document.getElementById('carta-info').innerHTML = 
-                `<strong>Carta ${numeroCarta}:</strong> ${getOggettoHtml(cartaCorrente.oggetto)} in ${tipoZona} ${cartaCorrente.zona}`;
+            document.getElementById('carta-info').innerHTML =
+                `<strong>Codice ${numeroCarta}:</strong> ${getOggettoHtml(cartaCorrente.oggetto)} in ${tipoZona} ${cartaCorrente.zona}`;
 
             document.getElementById('area-risposte').classList.remove('hidden');
 
@@ -987,20 +1031,20 @@
                 const isMioTurno = (giocatoreCorrente === turnoCorrente);
 
                 if (isMioTurno) {
-                    // Chi ha il turno vede solo il bottone per la quantità
-                    document.getElementById('btn-giocatore-a').textContent = 'Vedi la tua risposta (Quantità)';
+                    // Chi ha il turno vede solo il bottone per la POSIZIONE
+                    document.getElementById('btn-giocatore-a').textContent = 'Vedi la tua risposta (Posizione)';
                     document.getElementById('btn-container-a').classList.remove('hidden');
                     document.getElementById('btn-container-b').classList.add('hidden');
                 } else {
-                    // Chi non ha il turno vede solo il bottone per la posizione
-                    document.getElementById('btn-giocatore-b').textContent = 'Vedi la tua risposta (Posizione)';
+                    // Chi non ha il turno vede solo il bottone per la QUANTITÀ
+                    document.getElementById('btn-giocatore-b').textContent = 'Vedi la tua risposta (Quantità)';
                     document.getElementById('btn-container-a').classList.add('hidden');
                     document.getElementById('btn-container-b').classList.remove('hidden');
                 }
             } else {
-                // Modalità locale: mostra entrambi i bottoni con testi originali
-                document.getElementById('btn-giocatore-a').textContent = 'Giocatore A (chi ha giocato)';
-                document.getElementById('btn-giocatore-b').textContent = 'Giocatore B (chi non ha giocato)';
+                // Modalità locale: mostra entrambi i bottoni con nomi dinamici
+                document.getElementById('btn-giocatore-a').innerHTML = `<span style="color: ${COLORE_GIOCATORE1}">${nomeGiocatore1}</span> (chi ha indagato)`;
+                document.getElementById('btn-giocatore-b').innerHTML = `<span style="color: ${COLORE_GIOCATORE2}">${nomeGiocatore2}</span> (avversario)`;
                 document.getElementById('btn-container-a').classList.remove('hidden');
                 document.getElementById('btn-container-b').classList.remove('hidden');
             }
@@ -1022,17 +1066,18 @@
             const caselleConOggetto = zona.filter(c => scheda[c] === oggettoCercato);
             const quantita = caselleConOggetto.length;
 
-            let rispostaB;
+            // Chi gioca (A) vede la POSIZIONE, chi non gioca (B) vede la QUANTITÀ
+            let rispostaA;
             if (quantita === 0) {
-                rispostaB = 'Quantità: 0';
+                rispostaA = 'Posizione: nessuna';
             } else {
                 const casellaCasuale = caselleConOggetto[Math.floor(Math.random() * caselleConOggetto.length)];
-                rispostaB = `Posizione: ${casellaCasuale}`;
+                rispostaA = `Posizione: ${casellaCasuale}`;
             }
 
             return {
-                rispostaA: `Quantità: ${quantita}`,
-                rispostaB: rispostaB
+                rispostaA: rispostaA,
+                rispostaB: `Quantità: ${quantita}`
             };
         }
 
